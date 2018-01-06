@@ -1,29 +1,63 @@
 import React from 'react'
-import { StyleSheet, View, FlatList, StatusBar} from 'react-native'
+import { StyleSheet, View, FlatList, StatusBar, AsyncStorage } from 'react-native'
 import request from 'superagent'
-import { List, ListItem, SearchBar } from "react-native-elements"
+import { List, ListItem, SearchBar, Button, Icon } from "react-native-elements"
 import { StackNavigator } from 'react-navigation'
+import Ionicons from 'expo'
 
 export default class Home extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: [[5, 'ETH'], [2956.820051, 'XRP']],
+      data: {},
       tickerData: null
+    }
+    this.navigate = this.props.navigation.navigate
+  }
+
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    title: 'Holdings',
+    headerRight: <Icon
+      name='add'
+      type='md'
+      color='#000'
+      containerStyle={{paddingRight: 15}}
+      onPress={() => navigation.navigate('Edit', {})}
+    />
+  })
+
+  componentWillMount() {
+    this.initData()
+  }
+
+  
+  componentDidMount() {
+    this.getData()
+    this.interval = setInterval(() => {
+      this.getData(); 
+      this.initData()
+    }, 10000)
+  }
+
+  async initData() {
+    try {
+      let data = await AsyncStorage.getItem('data')
+      data =  JSON.parse(data)
+      if (data !== null) return this.setState({ data })
+      data = {}
+      await AsyncStorage.setItem('data', JSON.stringify(data))
+      this.setState({data: data})
+    } catch (error) {
+      console.log('err:', error)
     }
   }
 
-  static navigationOptions = {
-    title: 'Holdings'
-  };
-
-  componentDidMount() {
-    this.getPolo()
-    this.interval = setInterval(() => this.getPolo(), 10000)
-  }
-  
   componentWillUnmount() {
     clearInterval(this.interval)
+  }
+
+  getData() {
+    this.getPolo()
   }
 
   getPolo() {
@@ -34,16 +68,21 @@ export default class Home extends React.Component {
       })
   }
 
-  handlepress = (item, navigate) => {
-    navigate('Details', { "data": this.state.tickerData['USDT_' + item[1]], item: item })
+  handlepress = (item, navigate, loc) => {
+    if (loc === 'Details') {
+      return navigate('Details', { item: item })
+    }
+    if (item === null) {
+      navigate('Edit',{ data: null, item: null })
+    }
   }
 
   _renderItem = (item, navigate) => {
-    if (this.state.tickerData && this.state.tickerData[`USDT_${item[1]}`]) {
+    if (this.state.tickerData && this.state.tickerData[`USDT_${item[0]}`]) {
       return <ListItem
-        title={`${item[1]}: $${eval(this.state.tickerData['USDT_' + item[1]].last * item[0])}`}
-        subtitle={`${item[0]} ${item[1]} at $${this.state.tickerData['USDT_' + item[1]].last} each`}
-        onPress={() => this.handlepress(item, navigate)}
+        title={`${item[0]}: $${eval(this.state.tickerData['USDT_' + item[0]].last * item[1])}`}
+        subtitle={`${item[0]} ${item[1]} at $${this.state.tickerData['USDT_' + item[0]].last} each`}
+        onPress={() => this.handlepress(item, navigate, 'Details')}
       />
     }
   }
@@ -53,14 +92,13 @@ export default class Home extends React.Component {
   }
 
   render() {
-    const { navigate } = this.props.navigation
     return (
       <View style={styles.container}>
         <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
           <FlatList
-            data={this.state.data}
+            data={Object.values(this.state.data)}
             keyExtractor={this._keyExtractor}
-            renderItem={({ item }) => this._renderItem(item, navigate)}
+            renderItem={({ item }) => this._renderItem(item, this.navigate)}
             extraData={this.state}
           />
         </List>
@@ -70,6 +108,9 @@ export default class Home extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    color: '#000'
+  },
   container: {
     // flex: 1
   }
