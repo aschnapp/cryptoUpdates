@@ -12,6 +12,7 @@ import { Form,
   Separator,InputField, LinkField,
   SwitchField, PickerField, DatePickerField, TimePickerField
 } from 'react-native-form-generator'
+import { NavigationActions } from 'react-navigation'
 
 export default class Details extends React.Component {
   constructor(props) {
@@ -80,7 +81,12 @@ export default class Details extends React.Component {
   async saveData(data) {
     try {
       await AsyncStorage.setItem('data', JSON.stringify(data))
-      // this.props.navigation.navigate('Home')
+      this.props.navigation.dispatch(NavigationActions.reset({
+        index: 0,
+        actions: [
+          NavigationActions.navigate({ routeName: 'Home'})
+        ]
+      }));
       this.setState({ success: "Success!" })
     } catch (error) {
       this.setState({ error })

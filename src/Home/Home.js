@@ -20,8 +20,7 @@ export default class Home extends React.Component {
     headerRight: <Icon
       name='add'
       type='md'
-      color='#000'
-      containerStyle={{paddingRight: 15}}
+      containerStyle={{ paddingRight: 15 }}
       onPress={() => navigation.navigate('Edit', {})}
     />
   })
