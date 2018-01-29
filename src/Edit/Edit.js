@@ -121,7 +121,7 @@ export default class Details extends React.Component {
               "DASH": "DASH",
               "LTC": "LTC",
               "NXT": "NXT",
-              "STR": "STR",
+              "XLM": "XLM",
               "XMR": "XMR",
               "ZEC": "ZEC",
               "BCH": "BCH"
