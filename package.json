@@ -1,5 +1,5 @@
 {
-  "name": "cryptoUpdates",
+  "name": "crypto-updates",
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
