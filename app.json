@@ -1,5 +1,15 @@
 {
   "expo": {
-    "sdkVersion": "23.0.0"
+   "name": "Crypto Values",
+   "icon": "./path/to/your/app-icon.png",
+   "version": "1.0.0",
+   "slug": "crypto-values",
+   "sdkVersion": "1.0.0",
+   "ios": {
+     "bundleIdentifier": "com.yourcompany.yourappname"
+   },
+   "android": {
+     "package": "com.yourcompany.yourappname"
+   }
   }
 }
